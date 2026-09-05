@@ -1,0 +1,153 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg-primary: #1A1C23;
+    --color-bg-surface: #2A2D34;
+    --color-bg-cream: #F9F8F4;
+    --color-amber: #E89038;
+    --color-amber-hover: #F59E0B;
+    --color-text-white: #FFFFFF;
+    --color-text-ash: #A1A1AA;
+    --color-fresh: #2D6A4F;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: #1A1C23;
+    color: #FFFFFF;
+  }
+
+  body {
+    background-color: #1A1C23;
+    color: #FFFFFF;
+    font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Mixed-case display stylization for crafted artisanal feel */
+  .display-font {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+}
+
+@layer components {
+  /* Golden Amber Pill Primary Button */
+  .btn-pill-amber {
+    @apply bg-[#E89038] hover:bg-[#F59E0B] text-[#121316] font-semibold text-sm px-6 py-3.5 rounded-full inline-flex items-center justify-center gap-3 transition-all duration-300 shadow-amber-glow hover:shadow-amber-glow-lg hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#E89038] focus:ring-offset-2 focus:ring-offset-[#1A1C23];
+  }
+
+  /* Circular trailing arrow inside button */
+  .btn-arrow-circle {
+    @apply w-7 h-7 rounded-full bg-[#121316] text-[#E89038] flex items-center justify-center transition-transform duration-300 group-hover:translate-x-0.5;
+  }
+
+  /* Secondary Ghost/Outline Pill */
+  .btn-pill-secondary {
+    @apply border border-white/20 hover:border-[#E89038] text-white hover:text-[#E89038] bg-white/[0.04] hover:bg-white/[0.08] px-6 py-3.5 rounded-full font-medium text-sm inline-flex items-center justify-center gap-2.5 backdrop-blur-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#E89038]/50 active:scale-[0.98];
+  }
+
+  /* Dark Elevated Glass Card */
+  .card-dark {
+    @apply bg-white/[0.03] border border-white/10 rounded-2xl backdrop-blur-sm transition-all duration-300 hover:border-[#E89038]/40 hover:-translate-y-1 hover:shadow-dark-card;
+  }
+
+  /* Outer page container */
+  .container-outer {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Form inputs in dark surfaces */
+  .input-dark {
+    @apply w-full bg-[#1A1C23] border border-white/15 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-[#E89038] focus:ring-1 focus:ring-[#E89038] transition-colors;
+  }
+
+  /* Form inputs in light cream surfaces */
+  .input-light {
+    @apply w-full bg-white border border-[#EDE8DF] rounded-xl px-4 py-3 text-sm text-[#1E1F24] placeholder:text-zinc-400 focus:outline-none focus:border-[#E89038] focus:ring-1 focus:ring-[#E89038] transition-colors;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Floating animation for hero coffee bag */
+@keyframes floatBagHero {
+  0%, 100% {
+    transform: translateY(0px) rotate(-0.5deg);
+    filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 25px rgba(232, 144, 56, 0.25));
+  }
+  50% {
+    transform: translateY(-14px) rotate(0.8deg);
+    filter: drop-shadow(0 35px 45px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 35px rgba(232, 144, 56, 0.4));
+  }
+}
+
+.bag-hero-float {
+  animation: floatBagHero 6s ease-in-out infinite;
+}
+
+/* Subtle steam animation */
+@keyframes steamDrift {
+  0% { transform: translateY(0) scaleX(1); opacity: 0.2; }
+  50% { transform: translateY(-8px) scaleX(1.1); opacity: 0.5; }
+  100% { transform: translateY(-16px) scaleX(1.2); opacity: 0; }
+}
+
+.steam-drift {
+  animation: steamDrift 3s ease-out infinite;
+}
+
+/* Pulse ring for freshness indicator */
+@keyframes pulseRingAmber {
+  0% { box-shadow: 0 0 0 0 rgba(232, 144, 56, 0.5); }
+  70% { box-shadow: 0 0 0 10px rgba(232, 144, 56, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(232, 144, 56, 0); }
+}
+
+.pulse-ring-amber {
+  animation: pulseRingAmber 2.2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+@keyframes pulseRingGreen {
+  0% { box-shadow: 0 0 0 0 rgba(45, 106, 79, 0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(45, 106, 79, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(45, 106, 79, 0); }
+}
+
+.pulse-ring-green {
+  animation: pulseRingGreen 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+/* Cart badge pop */
+@keyframes popIn {
+  0% { transform: scale(0.5); }
+  70% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.pop-in {
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
