@@ -5,38 +5,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Dark Roastery Palette
-        roast: {
-          charcoal: '#1A1C23',
-          'charcoal-deep': '#121316',
-          slate: '#2A2D34',
-          'slate-light': '#383C45',
-          cream: '#F9F8F4',
-          'cream-dark': '#EDE8DF',
-          amber: '#E89038',
-          'amber-hover': '#F59E0B',
-          'amber-light': '#FDE68A',
-          ash: '#A1A1AA',
-          'ash-light': '#D4D4D8',
-          'fresh-green': '#2D6A4F',
-          'fresh-glow': '#10B981',
-          crimson: '#8B1E28',
+        // Specified Exact Design Tokens
+        accent: {
+          DEFAULT: '#EFAE54',
+          hover: '#DE9839',
         },
-        // Legacy fallbacks kept for compatibility
-        canvas: '#1A1C23',
-        surface: '#2A2D34',
-        muted: '#383C45',
-        primary: '#FFFFFF',
-        secondary: '#A1A1AA',
-        accent: '#E89038',
-        'accent-dark': '#D97706',
-        hairline: '#383C45',
-        fresh: '#2D6A4F',
+        surface: {
+          neutral: '#555555',
+          light: '#FFFFFF',
+        },
+        canvas: {
+          dark: '#121421',
+        },
+        text: {
+          'dark-primary': '#FFFFFF',
+          'dark-muted': '#A0A5B5',
+          'light-primary': '#121421',
+          'light-muted': '#7A7D8A',
+        },
+        pastel: {
+          blue: '#93B4F8',
+          mint: '#7CD5A9',
+          peach: '#F7B58D',
+          cyan: '#6FE1EC',
+        },
       },
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'Consolas', 'monospace'],
+        display: ['"Grandstander"', '"Sniglet"', '"Fredoka"', '"Nunito"', 'system-ui', 'sans-serif'],
+        body: ['"Roboto"', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         pill: '9999px',
@@ -44,39 +40,39 @@ const config: Config = {
         'card-lg': '24px',
       },
       boxShadow: {
-        'amber-glow': '0 0 25px -5px rgba(232, 144, 56, 0.45)',
-        'amber-glow-lg': '0 0 45px -5px rgba(232, 144, 56, 0.6)',
-        'dark-card': '0 20px 40px -15px rgba(0, 0, 0, 0.5)',
-        'floating-bag': '0 30px 60px -12px rgba(0, 0, 0, 0.75), 0 0 40px rgba(232, 144, 56, 0.15)',
+        'accent-glow': '0 0 25px -5px rgba(239, 174, 84, 0.45)',
+        'accent-glow-lg': '0 0 45px -5px rgba(239, 174, 84, 0.6)',
+        'card-soft': '0 12px 30px -10px rgba(0, 0, 0, 0.08)',
+        'dark-card': '0 20px 40px -15px rgba(0, 0, 0, 0.6)',
       },
       animation: {
-        'pulse-slow': 'pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'float-bag': 'floatBag 5s ease-in-out infinite',
         'float-gentle': 'floatGentle 4s ease-in-out infinite',
-        'slide-in-right': 'slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+        'pulse-subtle': 'pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'fade-in': 'fadeIn 0.25s ease-out',
         'scale-in': 'scaleIn 0.2s ease-out',
+        'steam-rise': 'steamRise 3s ease-out infinite',
       },
       keyframes: {
-        floatBag: {
-          '0%, 100%': { transform: 'translateY(0px) rotate(-1deg)' },
-          '50%': { transform: 'translateY(-12px) rotate(1deg)' },
-        },
         floatGentle: {
           '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-6px)' },
+          '50%': { transform: 'translateY(-8px)' },
         },
-        slideInRight: {
-          '0%': { transform: 'translateX(100%)' },
-          '100%': { transform: 'translateX(0)' },
+        pulseSubtle: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.85' },
         },
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
         scaleIn: {
-          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '0%': { opacity: '0', transform: 'scale(0.96)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        steamRise: {
+          '0%': { opacity: '0.3', transform: 'translateY(0px) scale(1)' },
+          '50%': { opacity: '0.6', transform: 'translateY(-10px) scale(1.05)' },
+          '100%': { opacity: '0', transform: 'translateY(-20px) scale(1.1)' },
         },
       },
     },

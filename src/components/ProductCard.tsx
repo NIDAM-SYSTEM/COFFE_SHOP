@@ -2,10 +2,11 @@ import { useState, useCallback } from 'react';
 import { ShoppingBag, Check, Mountain, Droplets } from 'lucide-react';
 import type { CoffeeProduct, GrindOption } from '../types';
 
-const GRINDS: GrindOption[] = ['Whole Bean', 'Moka Pot (Fine)', 'V60 / Filter', 'French Press (Coarse)'];
+const GRINDS: GrindOption[] = ['Whole Bean', 'Espresso', 'Moka Pot (Fine)', 'V60 / Filter', 'French Press (Coarse)'];
 
 const GRIND_LABELS: Record<GrindOption, string> = {
   'Whole Bean': 'Grains',
+  'Espresso': 'Espresso',
   'Moka Pot (Fine)': 'Moka',
   'V60 / Filter': 'V60',
   'French Press (Coarse)': 'Piston',

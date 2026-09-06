@@ -1,108 +1,230 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navbar } from './components/Navbar';
 import { AnnouncementBar } from './components/AnnouncementBar';
-import { Navigation } from './components/Navigation';
-import { HeroSection } from './components/HeroSection';
-import { ReassuranceBar } from './components/ReassuranceBar';
-import { ProductGrid } from './components/ProductGrid';
-import { CoffeeFinderModal } from './components/CoffeeFinderModal';
-import { StarterBundles } from './components/StarterBundles';
-import { WholesaleBanner } from './components/WholesaleBanner';
-import { Testimonials } from './components/Testimonials';
+import { VideoFooter } from './components/VideoFooter';
 import { CartDrawer } from './components/CartDrawer';
-import { Footer } from './components/Footer';
-import { useCart } from './store/useCart';
-import { PRODUCTS } from './data/catalog';
+import { SearchModal } from './components/SearchModal';
+import { LandingPage } from './pages/LandingPage';
+import { ContactPage } from './pages/ContactPage';
+import { ShopPage } from './pages/ShopPage';
+import { ProductDetailPage } from './pages/ProductDetailPage';
+import { StarterKitsPage } from './pages/StarterKitsPage';
+import { WholesalePage } from './pages/WholesalePage';
+import { RoasteryFreshnessPage } from './pages/RoasteryFreshnessPage';
+import { CheckoutPage } from './pages/CheckoutPage';
+import { CartProduct, MenuItem } from './types/coffeeHouse';
 import type { CoffeeProduct, GrindOption } from './types';
 
+import {
+  subscribeToCartDrawer,
+  syncCartItemQuantity,
+  syncRemoveCartItem,
+  syncClearCart,
+} from './store/useCart';
+
 export default function App() {
-  const [cartOpen, setCartOpen] = useState(false);
-  const [finderOpen, setFinderOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const {
-    items,
-    addItem,
-    removeItem,
-    updateQuantity,
-    clearCart,
-    totalItems,
-    subtotal,
-  } = useCart();
-
-  const handleAddToCart = useCallback(
-    (product: CoffeeProduct, grind: GrindOption) => {
-      addItem(product, grind);
-      // Brief flash to open cart after adding
-      setTimeout(() => setCartOpen(true), 250);
+  const [cartItems, setCartItems] = useState<CartProduct[]>([
+    {
+      id: 'americano',
+      name: 'Americano Coffee',
+      price: 50.0,
+      quantity: 1,
+      image: '/images/iced-coffee-menu.jpg',
+      sub: '100% Natural arabica or robusta, 50 Ml cup',
     },
-    [addItem]
+  ]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  // Scroll to top on route change if no anchor hash is present
+  useEffect(() => {
+    if (!location.hash) {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.hash]);
+
+  // Subscribe to CartDrawer open triggers from useCart hook
+  useEffect(() => {
+    return subscribeToCartDrawer((open) => {
+      setIsCartOpen(open);
+    });
+  }, []);
+
+  const handleAddToCart = useCallback((item: MenuItem) => {
+    setCartItems((prev) => {
+      const existing = prev.find((p) => p.id === item.id);
+      if (existing) {
+        return prev.map((p) =>
+          p.id === item.id ? { ...p, quantity: p.quantity + 1 } : p
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: 1,
+          image: item.image,
+          sub: item.sub,
+        },
+      ];
+    });
+  }, []);
+
+  const handleAddToCartSpecialty = useCallback(
+    (product: CoffeeProduct, grind: GrindOption, quantity: number = 1) => {
+      const itemKey = `${product.id}-${grind}`;
+      setCartItems((prev) => {
+        const existing = prev.find((p) => p.id === itemKey);
+        if (existing) {
+          return prev.map((p) =>
+            p.id === itemKey ? { ...p, quantity: p.quantity + quantity } : p
+          );
+        }
+        return [
+          ...prev,
+          {
+            id: itemKey,
+            name: `${product.name} (${grind})`,
+            price: product.price,
+            quantity: quantity,
+            image: product.image || '/images/products/salvador-coffee.png',
+            sub: `${product.origin} • ${product.lotCode} • ${product.weightGrams}g`,
+          },
+        ];
+      });
+      // Automatically open CartDrawer without page reload
+      setIsCartOpen(true);
+    },
+    []
   );
 
-  const handleOpenFinder = useCallback(() => setFinderOpen(true), []);
-  const handleCloseFinder = useCallback(() => setFinderOpen(false), []);
-  const handleOpenCart = useCallback(() => setCartOpen(true), []);
-  const handleCloseCart = useCallback(() => setCartOpen(false), []);
+  const handleUpdateQuantity = useCallback((id: string, qty: number) => {
+    if (qty <= 0) {
+      setCartItems((prev) => prev.filter((item) => item.id !== id));
+      syncRemoveCartItem(id);
+    } else {
+      setCartItems((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, quantity: qty } : item))
+      );
+      syncCartItemQuantity(id, qty);
+    }
+  }, []);
 
-  // Featured hero product is the best-seller Salvador San Alberto
-  const featuredProduct = PRODUCTS.find((p) => p.id === 'salvador-san-alberto') || PRODUCTS[0];
+  const handleRemoveItem = useCallback((id: string) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+    syncRemoveCartItem(id);
+  }, []);
+
+  const handleClearCart = useCallback(() => {
+    setCartItems([]);
+    syncClearCart();
+  }, []);
+
+  const scrollToMenu = useCallback(() => {
+    if (location.pathname !== '/') {
+      navigate('/#menu');
+      setTimeout(() => {
+        const el = document.getElementById('menu');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      const el = document.getElementById('menu');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location.pathname, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#1A1C23] text-white selection:bg-[#E89038] selection:text-[#121316]">
-      {/* 1. Announcement Bar */}
+    <div className="min-h-screen bg-[#121421] text-white selection:bg-[#EFAE54] selection:text-[#121421] font-body flex flex-col">
+      {/* 0. Top Operational & Delivery SLA Announcement Bar */}
       <AnnouncementBar />
 
-      {/* 2. Sticky Navigation */}
-      <Navigation
-        cartCount={totalItems}
-        onCartOpen={handleOpenCart}
-        onFinderOpen={handleOpenFinder}
+      {/* 1. Persistent Top Navigation Bar */}
+      <Navbar
+        cartCount={totalCartCount}
+        onCartClick={() => setIsCartOpen(true)}
+        onSearchClick={() => setIsSearchOpen(true)}
       />
 
-      <main>
-        {/* 3. Hero Section (Deep Charcoal, Sweeping Elliptical Curve, Overlapping Bag) */}
-        <HeroSection
-          featuredProduct={featuredProduct}
-          onFinderOpen={handleOpenFinder}
-          onAddToCart={handleAddToCart}
-        />
-
-        {/* 4. Process / Trust Section (Dark Slate, Connected 3 Steps, Sweeping Curve into Cream) */}
-        <ReassuranceBar />
-
-        {/* 5. Menu / Shop Section (Warm Cream #F9F8F4, High Contrast, Barista Craft, Clean Rows) */}
-        <ProductGrid
-          onAddToCart={handleAddToCart}
-          onOpenFinder={handleOpenFinder}
-        />
-
-        {/* 6. Starter Bundles (Dark Roastery Transition, Moka Pot Visual, Checklist, Amber Pill CTAs) */}
-        <StarterBundles onAddToCart={handleAddToCart} />
-
-        {/* 7. Testimonials (Deep Charcoal, Video Review Spotlight with Amber Play Button, Verified Cards) */}
-        <Testimonials />
-
-        {/* 8. Wholesale (B2B) Section (Moroccan Cafes, ICE + TVA, WhatsApp Concierge Form) */}
-        <WholesaleBanner />
+      {/* 2. Dynamic Route Content */}
+      <main className="flex-grow">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <LandingPage
+                onAddToCart={handleAddToCart}
+                onOrderNowClick={scrollToMenu}
+                onAddToCartSpecialty={handleAddToCartSpecialty}
+              />
+            }
+          />
+          <Route
+            path="/shop"
+            element={
+              <ShopPage
+                onAddToCartSpecialty={handleAddToCartSpecialty}
+                onOpenCart={() => setIsCartOpen(true)}
+              />
+            }
+          />
+          <Route
+            path="/shop/:slug"
+            element={
+              <ProductDetailPage
+                onAddToCartSpecialty={handleAddToCartSpecialty}
+                onOpenCart={() => setIsCartOpen(true)}
+              />
+            }
+          />
+          <Route
+            path="/starter-kits"
+            element={
+              <StarterKitsPage
+                onAddToCartSpecialty={handleAddToCartSpecialty}
+                onOpenCart={() => setIsCartOpen(true)}
+              />
+            }
+          />
+          <Route path="/wholesale" element={<WholesalePage />} />
+          <Route path="/roastery-freshness" element={<RoasteryFreshnessPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
 
-      {/* 9. Footer (Deepest Charcoal #121316, "Ready for Better Coffee", Casablanca Atelier Hours) */}
-      <Footer />
+      {/* 3. Persistent Video Highlight & Categorized Footer */}
+      <VideoFooter />
 
-      {/* 10. Coffee Finder Modal (30s Taste Assistant, Dark Luxury Quiz) */}
-      <CoffeeFinderModal
-        isOpen={finderOpen}
-        onClose={handleCloseFinder}
-        onAddToCart={handleAddToCart}
+      {/* 4. Global Interactive Overlays */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={cartItems}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+        onClearCart={handleClearCart}
       />
 
-      {/* 11. Cart Drawer (Slide-in, Free Shipping Progress, Moroccan COD Checkout) */}
-      <CartDrawer
-        isOpen={cartOpen}
-        onClose={handleCloseCart}
-        items={items}
-        subtotal={subtotal}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeItem}
-        onClearCart={clearCart}
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onSelectItem={(item) => {
+          handleAddToCart(item);
+          setIsCartOpen(true);
+        }}
       />
     </div>
   );
