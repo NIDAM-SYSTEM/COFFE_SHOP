@@ -25,6 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { label: 'STARTER KITS', href: '/starter-kits', isRoute: true },
     { label: 'MICRO-LOT', href: '/shop/salvador-san-alberto', isRoute: true },
     { label: 'WHOLESALE / B2B', href: '/wholesale', isRoute: true },
+    { label: 'SUIVI', href: '/order-tracking', isRoute: true },
     { label: 'CONTACT', href: '/contact', isRoute: true },
   ];
 
@@ -40,6 +41,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       setActiveNav('MICRO-LOT');
     } else if (location.pathname.startsWith('/shop')) {
       setActiveNav('SHOP');
+    } else if (location.pathname === '/order-tracking') {
+      setActiveNav('SUIVI');
     } else if (location.pathname === '/contact') {
       setActiveNav('CONTACT');
     } else if (location.hash) {

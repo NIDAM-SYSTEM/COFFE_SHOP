@@ -19,11 +19,12 @@
   - `/starter-kits` $\rightarrow$ `StarterKitsPage.tsx` (Curated Equipment & Coffee Bundles for Mouna with Origin Selector)
   - `/wholesale` $\rightarrow$ `WholesalePage.tsx` (B2B Cafe & Office Portal: Bulk Volume Tiers, Barista Calibration & Fiscal Compliance)
   - `/roastery-freshness` $\rightarrow$ `RoasteryFreshnessPage.tsx` (SLA & Roasting Schedule: Freshness Calendar, Delivery Map, COD Inspection Policy)
+  - `/checkout` $\rightarrow$ `CheckoutPage.tsx` (Moroccan 1-Page Express Checkout: COD Delivery Form, Payment Selector, Order Summary & WhatsApp Dispatch)
   - `*` $\rightarrow$ Fallback redirect to `/`
 - **Upcoming Route**:
-  - `/checkout` $\rightarrow$ `CheckoutPage.tsx` (Moroccan 1-Page Express Checkout: Delivery Form, COD Payment, Order Summary & WhatsApp Dispatch)
+  - `/order-tracking` $\rightarrow$ `OrderTrackingPage.tsx` (Live Moroccan Delivery Status: Frictionless lookup, 4-stage stepper, Courier WhatsApp coordination)
 - **Navigation Architecture**:
-  - `src/components/Navbar.tsx` provides persistent top navigation, synchronizing active indicators with route paths (`/`, `/contact`, `/shop`, `/shop/:slug`, `/starter-kits`, `/wholesale`, `/roastery-freshness`, `/checkout`) and smooth anchor scrolls.
+  - `src/components/Navbar.tsx` provides persistent top navigation, synchronizing active indicators with route paths (`/`, `/contact`, `/shop`, `/shop/:slug`, `/starter-kits`, `/wholesale`, `/roastery-freshness`, `/checkout`, `/order-tracking`) and smooth anchor scrolls.
 
 ---
 
@@ -48,10 +49,11 @@ coffe_shop/
     │   ├── bundles.ts             # [Phase 5] Curated Starter Kits mock records & equipment specs
     │   ├── catalog.ts             # Coffee catalog data, taxonomy constants & PDP specs (slug, agronomy, recipes)
     │   ├── coffeeHouseData.ts     # Menus, reviews, features data
-    │   └── moroccanCities.ts      # [Phase 8] Moroccan city list for checkout address dropdown
+    │   ├── moroccanCities.ts      # [Phase 8] Moroccan city list & SLA zones for checkout
+    │   └── mockOrders.ts          # [Phase 9] Mock order lookup store with delivery status state machine
     ├── types/
     │   ├── coffeeHouse.ts         # Cart, menu item interfaces
-    │   └── index.ts               # Core domain types (CoffeeProduct, CoffeeBundle, AgronomySpecs, BrewRecipe, GrindOption, CheckoutFormState, etc.)
+    │   └── index.ts               # Core domain types (CoffeeProduct, CoffeeBundle, CheckoutFormData, OrderStatus, CourierInfo, etc.)
     ├── store/
     │   └── useCart.ts             # Shopping cart store with useSyncExternalStore & drawer trigger events
     ├── utils/
@@ -64,7 +66,8 @@ coffe_shop/
     │   ├── StarterKitsPage.tsx    # Curated Equipment & Coffee Bundles view with custom origin selector
     │   ├── WholesalePage.tsx      # B2B Cafe & Office Wholesale Portal
     │   ├── RoasteryFreshnessPage.tsx # [Phase 7] SLA & Roasting Schedule Portal
-    │   └── CheckoutPage.tsx       # [Phase 8] Moroccan 1-Page Express Checkout
+    │   ├── CheckoutPage.tsx       # [Phase 8] Moroccan 1-Page Express Checkout
+    │   └── OrderTrackingPage.tsx  # [Phase 9] Live Moroccan Delivery Status & Order Lookup
     └── components/
         ├── AnnouncementBar.tsx    # Promo banner component
         ├── CartDrawer.tsx         # Slide-out shopping cart drawer (CTA links to /checkout)
@@ -103,6 +106,10 @@ coffe_shop/
         │   ├── MoroccoAddressForm.tsx  # Delivery form: Full Name, WhatsApp, City Dropdown, Address, Notes
         │   ├── OrderSummaryCard.tsx    # Dynamic order summary panel linked to useCart (items, subtotal, shipping, total)
         │   └── PaymentMethodToggle.tsx # COD (default) vs. CMI Card payment selector
+        ├── tracking/              # [Phase 9] Live Order Tracking components
+        │   ├── TrackingSearchInput.tsx  # Phone / Order ID lookup with URL param sync
+        │   ├── DeliveryStatusTimeline.tsx # 4-stage visual stepper (Confirmée → Livreur → En route → Livré)
+        │   └── CourierContactCard.tsx   # Courier badge, ETA window & WhatsApp driver callout
         ├── contact/
         │   ├── ContactForm.tsx    # Controlled contact form with validation (no placeholders)
         │   └── ContactInfoCards.tsx # Location, hours, phone, email & social details
@@ -132,7 +139,8 @@ coffe_shop/
 | `/starter-kits` | `StarterKitsPage` (`src/pages/StarterKitsPage.tsx`) | Curated Equipment & Coffee Bundles (Target Persona: Mouna) | **Active** |
 | `/wholesale` | `WholesalePage` (`src/pages/WholesalePage.tsx`) | B2B Cafe & Office Portal (Target Persona: Cafe Owners & Office Managers) | **Active** |
 | `/roastery-freshness` | `RoasteryFreshnessPage` (`src/pages/RoasteryFreshnessPage.tsx`) | SLA & Roasting Schedule (Target Persona: Nidal & Wholesale Partners) | **Active** |
-| `/checkout` | `CheckoutPage` (`src/pages/CheckoutPage.tsx`) | Moroccan 1-Page Express Checkout — COD delivery form, order summary & WhatsApp dispatch (Target Persona: Nidal & Mouna) | **Planned** |
+| `/checkout` | `CheckoutPage` (`src/pages/CheckoutPage.tsx`) | Moroccan 1-Page Express Checkout — COD delivery form, order summary & WhatsApp dispatch (Target Persona: Nidal & Mouna) | **Active** |
+| `/order-tracking` | `OrderTrackingPage` (`src/pages/OrderTrackingPage.tsx`) | Live Moroccan Delivery Status — order lookup, 4-stage stepper & courier coordination (Target Persona: Nidal & Mouna) | **Planned** |
 | `*` | `<Navigate to="/" replace />` | Fallback route redirecting to Home | **Active** |
 
 ---
@@ -684,6 +692,126 @@ src/pages/CheckoutPage.tsx
 
 ---
 
+### Phase 9: `/order-tracking` — Live Moroccan Delivery Status (Planned)
+**Target Personas**: Nidal (repeat buyer tracking high-value micro-lot) & Mouna (first-time buyer reducing post-purchase anxiety on Moroccan COD courier routes).
+
+#### Architectural Objectives
+- Eliminate post-purchase anxiety with a frictionless, account-free order status page.
+- Surface the 4-stage Moroccan COD delivery pipeline with a clear visual stepper.
+- Provide direct courier WhatsApp coordination so customers never feel abandoned.
+- Auto-hydrate from URL params (`?orderId=` / `?phone=`) when redirected from `/checkout`.
+
+#### Key Architectural Requirements
+1. **Frictionless Lookup (No Password / No Account Required)**:
+   - Fast Search Bar: Lookup via Moroccan WhatsApp Phone Number OR Order Reference (e.g., `#MA-8492` or `CH-XXXXXX-YYY`).
+   - Auto-detection: Read `?orderId=` or `?phone=` directly from URL query parameters (for users redirected from `/checkout`).
+2. **Moroccan Delivery Timeline & Step Progression**:
+   - 4-Stage Visual Status Stepper:
+     1. Commande Confirmée & En Préparation (Torréfaction & Mouture).
+     2. Remis au Livreur / Hub Régional (Casablanca / Rabat / Marrakech).
+     3. En Cours de Livraison Locale (Livreur en route vers votre adresse).
+     4. Livré & Encaissé (Paiement Cash à la livraison validé).
+   - Active courier dispatch details: Assigned Moroccan courier company badge (Amana Express, CTM Messagerie, Rib'al-Barid), Estimated arrival window (e.g., "Aujourd'hui entre 14:00 et 18:00"), and city destination.
+3. **Post-Purchase Reassurance & Actions**:
+   - Direct Courier Coordination: `[Contacter le Livreur sur WhatsApp]` button with pre-filled message.
+   - Freshness & Inspection Reminder: *"N'oubliez pas : vérifiez la date de torréfaction avant de payer."*
+   - Order Items Breakdown: List of beans, grinds, and total COD amount due to the courier in MAD.
+
+#### Component Breakdown & Hierarchy
+```text
+src/pages/OrderTrackingPage.tsx
+├── src/components/tracking/TrackingSearchInput.tsx   # Phone / Order ID form with URL search param sync
+├── src/components/tracking/DeliveryStatusTimeline.tsx # 4-stage visual stepper (vertical mobile / horizontal desktop)
+├── src/components/tracking/CourierContactCard.tsx     # Courier badge + ETA + WhatsApp driver callout + items list
+└── src/data/mockOrders.ts                             # Mock lookup store for order statuses covering all 4 stages
+```
+
+#### TypeScript Interfaces (`src/types/index.ts`)
+```typescript
+export type DeliveryStage = 'confirmed' | 'dispatched_hub' | 'out_for_delivery' | 'delivered';
+
+export interface CourierInfo {
+  name: string;                    // e.g. 'Amana Express', 'CTM Messagerie', "Rib'al-Barid"
+  trackingId?: string;             // Courier parcel tracking reference
+  trackingUrl?: string;            // Deep link to courier tracking portal
+  whatsAppNumber: string;          // Store dispatch WhatsApp contact for coordination
+  logoColor: string;               // Tailwind brand color chip
+}
+
+export interface MockOrderItem {
+  name: string;
+  grind: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface MockOrder {
+  id: string;                      // e.g. 'MA-1024' or 'CH-M7X4Q2-A3F'
+  phone: string;                   // Moroccan mobile for secondary lookup
+  customerName: string;
+  city: string;
+  address: string;
+  currentStage: DeliveryStage;
+  courier: CourierInfo;
+  estimatedDelivery: string;        // e.g. "Aujourd'hui entre 14:00 et 18:00"
+  roastedDate: string;             // ISO date string
+  items: MockOrderItem[];
+  subtotal: number;
+  shipping: number;
+  totalMAD: number;                // Total COD amount due to courier in MAD
+  placedAt: string;                // ISO date string
+  statusHistory: { stage: DeliveryStage; timestamp: string }[];
+}
+```
+
+#### Global Integration Points
+- `src/App.tsx` — Register route `/order-tracking`.
+- `src/components/Navbar.tsx` & Utility Bar — Wire links into navigation for easy access.
+- `src/components/VideoFooter.tsx` — Add "Suivre ma commande" to footer links.
+- `src/pages/CheckoutPage.tsx` — Confirmation screen triggers / links to `/order-tracking?orderId={newOrderId}`.
+
+#### Ordered Task Checklist:
+- [x] **Task 34: Create `src/data/mockOrders.ts` and define `OrderStatus` interfaces (status stages, courier data, timeline steps)**
+  - Define `DeliveryStage` union type and `CourierInfo`, `MockOrderItem`, `MockOrder` interfaces in `src/types/index.ts`.
+  - Populate `MOCK_ORDERS: MockOrder[]` with 4 seed records covering all delivery stages:
+    * Order 1 (`confirmed`): Casablanca, Amana Express — torréfaction & mouture en cours.
+    * Order 2 (`dispatched_hub`): Rabat, CTM Messagerie — remis au hub régional.
+    * Order 3 (`out_for_delivery`): Marrakech, Amana Express — livreur en route, ETA today.
+    * Order 4 (`delivered`): Tanger, Rib'al-Barid — livré & COD encaissé.
+  - Implement `lookupOrder(query: string): MockOrder | undefined` matching by Order ID (exact) or Moroccan phone number.
+  - Define `STAGE_CONFIG` map with stage labels, sublabels, Lucide icons, and active color tokens.
+
+- [x] **Task 35: Build `TrackingSearchInput.tsx` with Moroccan phone/order ID formatting and URL search param synchronization**
+  - Controlled input accepting either Moroccan mobile (`06/07XXXXXXXX`) or Order ID (`MA-XXXX` / `CH-XXXXXX-YYY`).
+  - Auto-read query params (`?orderId=` or `?phone=`) using `useSearchParams()` on mount.
+  - Search trigger updating URL search parameters smoothly without full page reload.
+  - Auto-format Moroccan phone numbers as typed (spacing after every 2 digits).
+  - Validation styling matching project design tokens (`#121421`, `#EFAE54`).
+
+- [x] **Task 36: Build `DeliveryStatusTimeline.tsx` and `CourierContactCard.tsx` with WhatsApp driver callout**
+  - **`DeliveryStatusTimeline.tsx`**:
+    * 4-step vertical (mobile) / horizontal (desktop ≥lg) stepper with active status lights and timestamps.
+    * Completed: emerald checkmarks with solid connectors; Active: amber pulsing ring; Pending: muted dashed connectors.
+    * Highlight COD total due in Moroccan Dirhams: *"Montant à préparer en Cash: [Total] MAD"*.
+  - **`CourierContactCard.tsx`**:
+    * Assigned regional courier company badge, ETA arrival window chip, and destination address.
+    * Button: `[Coordonner avec le livreur via WhatsApp]` with pre-filled message:
+      `Salam, je suis [Nom], je vous contacte concernant ma commande de café #[OrderId] pour la livraison à [Quartier].`
+    * Inspection policy reminder banner: *"N'oubliez pas : vérifiez la date de torréfaction avant de payer."* with freshness seal reminder.
+
+- [x] **Task 37: Assemble `OrderTrackingPage.tsx`, wire `/order-tracking` in `App.tsx`, and link navigation/footer tracking triggers**
+  - **`OrderTrackingPage.tsx`**:
+    * Combine search input, 4-stage delivery timeline, courier contact card, and items summary breakdown.
+    * If no order matches, display a clear, helpful fallback (*"Aucune commande trouvée avec ce numéro"*) with WhatsApp support CTA.
+    * "Ce n'est pas ma commande" link to reset and perform a new search.
+  - Register `/order-tracking` route inside `src/App.tsx`.
+  - Add "Suivi de Commande" link to the Footer (`VideoFooter.tsx`), Navbar (`Navbar.tsx`), and Utility Bar (`AnnouncementBar.tsx`).
+  - Run `npm run build` to verify zero build or TypeScript errors across the entire project.
+
+---
+
 ## 8. Current State
-**Express Checkout Live** — Moroccan 1-Page COD Express Checkout fully integrated across all routes.
+**All Core Architecture Routes Live**
+
+
 

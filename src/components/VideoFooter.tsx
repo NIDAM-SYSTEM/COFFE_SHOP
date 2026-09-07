@@ -157,6 +157,16 @@ export const VideoFooter: React.FC = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link
+                    to="/order-tracking"
+                    className="hover:text-[#EFAE54] transition-colors flex items-center gap-1.5 font-medium text-white/90 group"
+                    id="footer-link-order-tracking"
+                  >
+                    <span className="text-[#EFAE54] text-xs">📦</span>
+                    <span className="group-hover:translate-x-0.5 transition-transform">Suivi de Commande</span>
+                  </Link>
+                </li>
+                <li>
                   <a href="#menu" className="hover:text-[#EFAE54] transition-colors">
                     Café Menu
                   </a>
@@ -241,3 +251,4 @@ export const VideoFooter: React.FC = () => {
     </footer>
   );
 };
+

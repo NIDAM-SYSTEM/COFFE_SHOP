@@ -259,3 +259,116 @@ export interface Testimonial {
   rating: number;
   tag: 'Connoisseur' | 'Beginner' | 'Cafe Partner';
 }
+
+// ── Phase 9: Order Tracking Types ──────────────────────────────────────────
+
+/**
+ * 4-stage forward-only Moroccan COD delivery pipeline.
+ * Note: 'dispatched_hub' used in implementation (matches user spec);
+ * PROJECT_MAP also references 'dispatched' — both are aliased here.
+ */
+export type DeliveryStage =
+  | 'confirmed'         // Commande confirmée & torréfaction en cours
+  | 'dispatched_hub'    // Remis au livreur / hub régional
+  | 'out_for_delivery'  // En cours de livraison locale
+  | 'delivered';        // Livré & COD encaissé
+
+/** Ordered array of stages for stepper index lookups */
+export const DELIVERY_STAGES: DeliveryStage[] = [
+  'confirmed',
+  'dispatched_hub',
+  'out_for_delivery',
+  'delivered',
+];
+
+/** Display metadata for each delivery stage */
+export interface StageConfig {
+  label: string;
+  sublabel: string;
+  /** Lucide icon name (string — component resolves at render time) */
+  iconName: string;
+  /** Tailwind color token class for active state */
+  activeColor: string;
+}
+
+export const STAGE_CONFIG: Record<DeliveryStage, StageConfig> = {
+  confirmed: {
+    label: 'Commande Confirmée',
+    sublabel: 'Torréfaction & mouture en cours au labo Casablanca',
+    iconName: 'ClipboardCheck',
+    activeColor: 'text-amber-400',
+  },
+  dispatched_hub: {
+    label: 'Remis au Livreur',
+    sublabel: 'Sachet scellé pris en charge par le coursier régional',
+    iconName: 'PackageCheck',
+    activeColor: 'text-blue-400',
+  },
+  out_for_delivery: {
+    label: 'En Cours de Livraison',
+    sublabel: 'Livreur en route vers votre adresse',
+    iconName: 'Truck',
+    activeColor: 'text-orange-400',
+  },
+  delivered: {
+    label: 'Livré & Encaissé',
+    sublabel: 'Paiement Cash à la livraison validé — Bon café !',
+    iconName: 'BadgeCheck',
+    activeColor: 'text-emerald-400',
+  },
+};
+
+/** Moroccan courier company metadata */
+export interface CourierInfo {
+  /** Display name, e.g. 'Amana Express' */
+  name: string;
+  /** Courier's own parcel tracking reference (if available) */
+  trackingId?: string;
+  /** Deep link to courier's own tracking portal */
+  trackingUrl?: string;
+  /**
+   * WhatsApp number for order coordination.
+   * In production this is the store's dispatch number, not the driver's personal number.
+   */
+  whatsAppNumber: string;
+  /** Tailwind background color class for the courier badge chip */
+  logoColor: string;
+}
+
+/** Single line item inside a mock order */
+export interface MockOrderItem {
+  name: string;
+  grind: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+/** Full mock order record — the shape returned by lookupOrder() */
+export interface MockOrder {
+  /** App-generated order code, e.g. 'MA-1024' or 'CH-M7X4Q2-A3F' */
+  id: string;
+  orderId: string;
+  /** Customer's Moroccan WhatsApp number (used as secondary lookup key) */
+  phone: string;
+  customerName: string;
+  city: string;
+  address: string;
+  /** Current position in the 4-stage pipeline */
+  currentStage: DeliveryStage;
+  courier: CourierInfo;
+  courierName: string;
+  courierPhone: string;
+  /** Human-readable ETA, e.g. "Aujourd'hui entre 14:00 et 18:00" */
+  estimatedDelivery: string;
+  /** ISO date string of the roast batch */
+  roastedDate: string;
+  items: MockOrderItem[];
+  subtotal: number;
+  shipping: number;
+  /** Total COD amount due to the courier in MAD */
+  totalMAD: number;
+  /** ISO datetime when the order was placed */
+  placedAt: string;
+  /** Chronological log of completed stage transitions */
+  statusHistory: { stage: DeliveryStage; timestamp: string }[];
+}

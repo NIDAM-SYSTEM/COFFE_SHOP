@@ -13,6 +13,7 @@ import { StarterKitsPage } from './pages/StarterKitsPage';
 import { WholesalePage } from './pages/WholesalePage';
 import { RoasteryFreshnessPage } from './pages/RoasteryFreshnessPage';
 import { CheckoutPage } from './pages/CheckoutPage';
+import { OrderTrackingPage } from './pages/OrderTrackingPage';
 import { CartProduct, MenuItem } from './types/coffeeHouse';
 import type { CoffeeProduct, GrindOption } from './types';
 
@@ -200,6 +201,7 @@ export default function App() {
           <Route path="/wholesale" element={<WholesalePage />} />
           <Route path="/roastery-freshness" element={<RoasteryFreshnessPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-tracking" element={<OrderTrackingPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

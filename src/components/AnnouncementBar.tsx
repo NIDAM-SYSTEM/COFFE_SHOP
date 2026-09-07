@@ -34,6 +34,16 @@ export function AnnouncementBar() {
 
         {/* Right utilities */}
         <div className="flex items-center gap-3 shrink-0">
+          {/* Suivi de commande link */}
+          <Link
+            to="/order-tracking"
+            className="flex items-center gap-1.5 text-xs text-zinc-300 hover:text-[#EFAE54] transition-colors"
+            id="announcement-order-tracking-link"
+          >
+            <Truck size={13} strokeWidth={1.75} className="text-[#EFAE54]" />
+            <span className="hidden sm:inline">Suivi de Commande</span>
+          </Link>
+
           {/* Currency badge */}
           <span className="hidden md:flex items-center font-mono text-[11px] text-zinc-300 border border-white/15 rounded-full px-2.5 py-0.5 bg-white/[0.04]">
             MAD ﺩ.ﻡ.
