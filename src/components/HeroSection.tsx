@@ -47,7 +47,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOrderNowClick }) => 
         {/* ------------------------------------------------------------- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-4 items-center">
           
-          {/* Column 1: Left Content (Completely in Gray Background) */}
+          {/* Column 1: Left Content (Aligned cleanly with navbar logo) */}
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left z-20">
             <h1 className="font-display text-4xl sm:text-5xl lg:text-[48px] xl:text-[54px] font-extrabold text-white leading-[1.02] tracking-tight">
               <span className="block">ENjoy Your</span>
@@ -64,7 +64,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOrderNowClick }) => 
               Boost your productivity and build your mood with a glass of coffee in the morning.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-3 mt-4 sm:mt-5">
+            <div className="flex items-center mt-4 sm:mt-5">
               <Link
                 to="/shop"
                 className="group px-6 py-2.5 rounded-full bg-[#EFAE54] hover:bg-[#DE9839] text-[#121421] font-bold text-xs sm:text-sm inline-flex items-center gap-3 shadow-md hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 focus:outline-none"
@@ -75,19 +75,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOrderNowClick }) => 
                   <ArrowRight className="w-3.5 h-3.5 text-[#121421]" strokeWidth={2.5} />
                 </span>
               </Link>
-
-              <Link
-                to="/shop/salvador-san-alberto"
-                className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white hover:text-[#EFAE54] text-xs font-mono transition-all flex items-center gap-1.5 backdrop-blur-sm"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#EFAE54] animate-pulse" />
-                <span>Micro-lot Vedette (Finca Bourbon) →</span>
-              </Link>
             </div>
           </div>
 
-          {/* Column 2: Exact Centerpiece Coffee Cup (Dead-center at 50% of Hero) */}
-          <div className="hidden lg:flex items-center justify-center relative z-20">
+          {/* Column 2: Centerpiece Coffee Cup (Shifted slightly to the left into open space) */}
+          <div className="hidden lg:flex items-center justify-center relative z-20 lg:-translate-x-6 xl:-translate-x-10">
             <div className="w-full flex items-center justify-center">
               <CenterpieceCoffeeCup className="w-full max-w-[270px] sm:max-w-[300px] lg:max-w-[325px] xl:max-w-[345px] h-[280px] sm:h-[315px] lg:h-[350px] xl:h-[370px]" />
             </div>

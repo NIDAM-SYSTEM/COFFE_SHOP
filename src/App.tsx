@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
-import { AnnouncementBar } from './components/AnnouncementBar';
 import { VideoFooter } from './components/VideoFooter';
 import { CartDrawer } from './components/CartDrawer';
 import { SearchModal } from './components/SearchModal';
@@ -148,8 +147,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#121421] text-white selection:bg-[#EFAE54] selection:text-[#121421] font-body flex flex-col">
-      {/* 0. Top Operational & Delivery SLA Announcement Bar */}
-      <AnnouncementBar />
+      {/* 1. Persistent Top Navigation Bar */}
 
       {/* 1. Persistent Top Navigation Bar */}
       <Navbar
