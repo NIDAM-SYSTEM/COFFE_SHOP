@@ -7,11 +7,11 @@ interface PopularMenuProps {
   onAddToCart: (item: MenuItem) => void;
 }
 
+const CATEGORIES: MenuCategory[] = ['Coffee', 'Tea', 'Cookies', 'Coffee Machines'];
+
 export const PopularMenu: React.FC<PopularMenuProps> = ({ onAddToCart }) => {
   const [activeTab, setActiveTab] = useState<MenuCategory>('Coffee');
   const [addedItemIds, setAddedItemIds] = useState<Record<string, boolean>>({});
-
-  const categories: MenuCategory[] = ['Coffee', 'Tea', 'Cookies', 'Coffee Machines'];
 
   const displayedItems = useMemo(() => {
     return POPULAR_MENU_ITEMS.filter((item) => item.category === activeTab);
@@ -26,29 +26,40 @@ export const PopularMenu: React.FC<PopularMenuProps> = ({ onAddToCart }) => {
   };
 
   return (
-    <section id="menu" className="w-full bg-[#FFFFFF] text-[#121421] py-16 sm:py-24">
+    <section 
+      id="menu" 
+      className="w-full bg-[#FFFFFF] text-[#121421] py-16 sm:py-24"
+      aria-labelledby="menu-heading"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Header Row */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-gray-100">
           <div>
             <span className="text-[#EFAE54] text-xs uppercase font-bold tracking-widest">
               Finest Selection
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#121421] mt-1">
+            <h2 id="menu-heading" className="font-display text-3xl sm:text-4xl font-extrabold text-[#121421] mt-2">
               Popular Menu
             </h2>
           </div>
 
-          {/* Horizontal Filter Tabs: Coffee, Tea, Cookies, Coffee Machines */}
-          <div className="flex items-center flex-wrap gap-2 sm:gap-3">
-            {categories.map((cat) => {
+          {/* Horizontal Filter Tabs */}
+          <div 
+            className="flex items-center flex-wrap gap-2 sm:gap-3"
+            role="tablist"
+            aria-label="Menu Categories"
+          >
+            {CATEGORIES.map((cat) => {
               const isActive = activeTab === cat;
               return (
                 <button
                   key={cat}
+                  role="tab"
+                  aria-selected={isActive}
                   onClick={() => setActiveTab(cat)}
                   type="button"
-                  className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
+                  className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#EFAE54] ${
                     isActive
                       ? 'bg-[#EFAE54] text-[#121421] shadow-md scale-105'
                       : 'bg-gray-100 text-[#7A7D8A] hover:bg-gray-200 hover:text-[#121421]'
@@ -60,43 +71,46 @@ export const PopularMenu: React.FC<PopularMenuProps> = ({ onAddToCart }) => {
             })}
           </div>
 
-          {/* Right-aligned link */}
+          {/* Right-aligned link (Desktop) */}
           <a
-            href="#menu"
-            onClick={(e) => {
-              e.preventDefault();
-              setActiveTab('Coffee');
-            }}
-            className="hidden lg:inline-flex items-center gap-1.5 text-sm font-bold text-[#121421] hover:text-[#EFAE54] transition-colors group"
+            href="#full-menu"
+            className="hidden lg:inline-flex items-center gap-1.5 text-sm font-bold text-[#121421] hover:text-[#EFAE54] transition-colors group outline-none focus-visible:ring-2 focus-visible:ring-[#EFAE54] rounded-md p-1"
           >
             <span>View All Menu</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
         </div>
 
         {/* Responsive Product Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-10">
+        {/* The key on this div forces a re-render for smooth CSS entry animations when tabs change */}
+        <div 
+          key={activeTab}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out"
+          aria-live="polite"
+        >
           {displayedItems.map((item) => {
             const isAdded = !!addedItemIds[item.id];
+            
             return (
               <div
                 key={item.id}
-                className="group relative bg-[#FFFFFF] rounded-3xl p-6 border border-gray-100 hover:border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="group relative bg-white rounded-3xl p-6 border border-gray-100 hover:border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-default"
               >
-                {/* Visual Area with Centered Pastel Accent Circle & Centered Product Image */}
+                {/* Visual Area */}
                 <div className="relative w-full aspect-square flex items-center justify-center overflow-hidden rounded-2xl mb-5 bg-[#FAFAFA]">
                   {/* Pastel Accent Circle */}
                   <div
-                    className="absolute w-44 h-44 sm:w-48 sm:h-48 rounded-full transition-transform duration-300 group-hover:scale-110 opacity-85"
+                    className="absolute w-44 h-44 sm:w-48 sm:h-48 rounded-full transition-transform duration-500 ease-out group-hover:scale-110 opacity-85"
                     style={{ backgroundColor: item.pastelColor }}
+                    aria-hidden="true"
                   />
 
-                  {/* Centered Product Image - Pure Transparent PNG without background or checkerboard */}
-                  <div className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-1.5">
+                  {/* Centered Product Image */}
+                  <div className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center transition-transform duration-500 ease-out group-hover:-translate-y-2">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-full h-full object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.15)]"
+                      className="w-full h-full object-contain drop-shadow-xl"
                       loading="lazy"
                     />
                   </div>
@@ -108,12 +122,12 @@ export const PopularMenu: React.FC<PopularMenuProps> = ({ onAddToCart }) => {
                     {item.name}
                   </h3>
 
-                  <p className="text-xs text-[#7A7D8A] mt-1 line-clamp-2 leading-relaxed flex-grow">
+                  <p className="text-xs text-[#7A7D8A] mt-1.5 line-clamp-2 leading-relaxed flex-grow">
                     {item.sub}
                   </p>
 
                   {/* Price & Action Row */}
-                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between mt-5 pt-4 border-t border-gray-100">
                     <span className="font-display text-xl font-extrabold text-[#121421]">
                       ${item.price.toFixed(2)}
                     </span>
@@ -121,21 +135,21 @@ export const PopularMenu: React.FC<PopularMenuProps> = ({ onAddToCart }) => {
                     <button
                       type="button"
                       onClick={() => handleAdd(item)}
-                      className={`h-9 px-3.5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 transition-all duration-200 focus:outline-none ${
+                      className={`h-10 px-4 rounded-full text-xs font-bold inline-flex items-center gap-1.5 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
                         isAdded
-                          ? 'bg-emerald-600 text-white scale-105'
-                          : 'bg-[#121421] text-white hover:bg-[#EFAE54] hover:text-[#121421] shadow-sm'
+                          ? 'bg-emerald-500 text-white scale-105 shadow-emerald-500/30 shadow-lg focus-visible:ring-emerald-500'
+                          : 'bg-[#121421] text-white hover:bg-[#EFAE54] hover:text-[#121421] shadow-sm hover:shadow-md focus-visible:ring-[#121421]'
                       }`}
-                      aria-label={`Add ${item.name} to cart`}
+                      aria-label={isAdded ? `Added ${item.name} to cart` : `Add ${item.name} to cart`}
                     >
                       {isAdded ? (
                         <>
-                          <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                          <Check className="w-4 h-4" strokeWidth={3} />
                           <span>Added</span>
                         </>
                       ) : (
                         <>
-                          <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
+                          <Plus className="w-4 h-4" strokeWidth={2.5} />
                           <span>Order</span>
                         </>
                       )}
@@ -148,15 +162,16 @@ export const PopularMenu: React.FC<PopularMenuProps> = ({ onAddToCart }) => {
         </div>
 
         {/* Mobile View All Link */}
-        <div className="mt-8 text-center lg:hidden">
+        <div className="mt-10 text-center lg:hidden">
           <a
-            href="#menu"
-            className="inline-flex items-center gap-2 text-sm font-bold text-[#121421] hover:text-[#EFAE54]"
+            href="#full-menu"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gray-50 text-sm font-bold text-[#121421] hover:bg-gray-100 hover:text-[#EFAE54] transition-all"
           >
             <span>View All Menu</span>
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>
+        
       </div>
     </section>
   );

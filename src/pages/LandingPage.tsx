@@ -23,11 +23,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* 1. Hero Section (Dual-Tone with Concave Arch Transition) */}
       <HeroSection onOrderNowClick={onOrderNowClick} />
 
+      {/* 3. Feature Dishes & Food Pairing Section (#121421) */}
+      <FeatureDishes onMoreMenuClick={onOrderNowClick} />
+
       {/* 2. Featured Specialty Micro-Lots with Direct PDP Navigation (#121421) */}
       <FeaturedRoasts onAddToCartSpecialty={onAddToCartSpecialty} />
 
-      {/* 3. Feature Dishes & Food Pairing Section (#121421) */}
-      <FeatureDishes onMoreMenuClick={onOrderNowClick} />
+      
 
       {/* 4. Popular Menu Section (#FFFFFF Pure White Background) */}
       <PopularMenu onAddToCart={onAddToCart} />
